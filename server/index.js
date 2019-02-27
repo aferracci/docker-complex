@@ -26,13 +26,17 @@ pgClient
 
 // Redis Client Setup
 const redis = require('redis');
+
 const redisClient = redis.createClient({
   host: keys.redisHost,
   port: keys.redisPort,
   retry_strategy: () => 1000
 });
+redisClient.on("error", function(err){
+  console.log("Redis Error: " + err);
+});
 const redisPublisher = redisClient.duplicate();
-
+const sub = redisPublisher.duplicate();
 // Express route handlers
 
 app.get('/', (req, res) => {
@@ -40,14 +44,17 @@ app.get('/', (req, res) => {
 });
 
 app.get('/values/all', async (req, res) => {
+  console.log("/values/all");
   const values = await pgClient.query('SELECT * from values');
-
+  console.log("values: " + values.rows);
   res.send(values.rows);
 });
 
 app.get('/values/current', async (req, res) => {
+  console.log("/values/all");
   redisClient.hgetall('values', (err, values) => {
     res.send(values);
+    console.log("values: " + err);
   });
 });
 
@@ -58,10 +65,16 @@ app.post('/values', async (req, res) => {
     return res.status(422).send('Index too high');
   }
 
+  console.log("inserting index: " + index);
   redisClient.hset('values', index, 'Nothing yet!');
   redisPublisher.publish('insert', index);
   pgClient.query('INSERT INTO values(number) VALUES($1)', [index]);
 
+  sub.on("message", (channel, message) => {
+    console.log("channel: " + channel);
+    console.log("message: " + message);
+    redisClient.hset('values', message, fib(parseInt(message)));
+  });
   res.send({ working: true });
 });
 
