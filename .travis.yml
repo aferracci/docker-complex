@@ -9,13 +9,11 @@ script:
   - docker run aferracci/react-test npm test -- --coverage
 
 after_success:
-  -docker build aferracci/complex-client ./client
-  -docker build aferracci/complex-nginx ./nginx
-  -docker build aferracci/complex-server ./server
-  -docker build aferracci/complex-worker ./worker
-  # Docker Hub login
+  - docker build aferracci/complex-client ./client
+  - docker build aferracci/complex-nginx ./nginx
+  - docker build aferracci/complex-server ./server
+  - docker build aferracci/complex-worker ./worker
   - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
-  # Push the images on docker hub
   - docker push aferracci/complex-client
   - docker push aferracci/complex-nginx
   - docker push aferracci/complex-server
