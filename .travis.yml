@@ -10,10 +10,10 @@ script:
   - docker run aferracci/react-test npm test -- --coverage
 
 after_success:
-  - docker build -t aferracci/complex-client -f ./client/Dockerfile
-  - docker build -t aferracci/complex-nginx -f ./nginx/Dockerfile
-  - docker build -t aferracci/complex-server -f ./server/Dockerfile
-  - docker build -t aferracci/complex-worker -f ./worker/Dockerfile
+  - docker build -t aferracci/complex-client -f ./client/Dockerfile ./client
+  - docker build -t aferracci/complex-nginx -f ./nginx/Dockerfile ./nginx
+  - docker build -t aferracci/complex-server -f ./server/Dockerfile ./server
+  - docker build -t aferracci/complex-worker -f ./worker/Dockerfile ./worker
   - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
   - docker push aferracci/complex-client
   - docker push aferracci/complex-nginx
