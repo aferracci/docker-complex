@@ -14,7 +14,7 @@ after_success:
   - docker build -t aferracci/complex-nginx -f ./nginx/Dockerfile ./nginx
   - docker build -t aferracci/complex-server -f ./server/Dockerfile ./server
   - docker build -t aferracci/complex-worker -f ./worker/Dockerfile ./worker
-  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
+  - docker login -u "$DOCKER_ID" -p "$DOCKER_PASSWORD"
   - docker push aferracci/complex-client
   - docker push aferracci/complex-nginx
   - docker push aferracci/complex-server
